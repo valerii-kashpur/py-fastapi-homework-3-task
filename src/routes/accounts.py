@@ -376,15 +376,17 @@ async def refresh_user(
             RefreshTokenModel.token == request_data.refresh_token
         )
     )
+    refresh_token = refresh_token.scalar_one_or_none()
 
-    if not refresh_token.scalar_one_or_none():
+    if not refresh_token:
         raise HTTPException(status_code=401, detail="Refresh token not found.")
 
     user = await db.execute(
         select(UserModel).where(UserModel.id == decoded_token.get("user_id"))
     )
+    user = user.scalar_one_or_none()
 
-    if not user.scalar_one_or_none():
+    if not user:
         raise HTTPException(status_code=404, detail="User not found.")
 
     access_token = jwt_manager.create_access_token(
