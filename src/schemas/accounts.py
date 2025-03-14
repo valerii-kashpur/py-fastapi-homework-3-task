@@ -63,3 +63,95 @@ class MessageResponseSchema(BaseModel):
             }
         }
     }
+
+
+class PasswordResetRequestSchema(BaseModel):
+    email: EmailStr
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "email": "test@example.com"
+            }
+        }
+    }
+
+
+class PasswordResetCompleteRequestSchema(BaseModel):
+    email: EmailStr
+    password: str
+    token: str
+
+    @field_validator("password")
+    @classmethod
+    def check_password_strength(cls, value: str) -> str:
+        return validate_password_strength(value)
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "email": "testuser@example.com",
+                "token": "valid-reset-token",
+                "new_password": "NewStrongPassword123!"
+            }
+        }
+    }
+
+
+class UserLoginRequestSchema(BaseModel):
+    email: EmailStr
+    password: str
+
+    @field_validator("password")
+    @classmethod
+    def check_password_strength(cls, value: str) -> str:
+        return validate_password_strength(value)
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "email": "user@example.com",
+                "password": "UserPassword123!"
+            }
+        }
+    }
+
+
+class UserLoginResponseSchema(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "token_type": "bearer"
+            }
+        }
+    }
+
+
+class TokenRefreshRequestSchema(BaseModel):
+    refresh_token: str
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "refresh_token": "example_refresh_token"
+            }
+        }
+    }
+
+
+class TokenRefreshResponseSchema(BaseModel):
+    access_token: str
+
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "access_token": "new_access_token"
+            }
+        }
+    }
